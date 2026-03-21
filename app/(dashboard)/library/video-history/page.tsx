@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export default function VideoHistoryPage() {
   const [videos, setVideos] = useState<any[]>([]);
@@ -50,14 +51,24 @@ export default function VideoHistoryPage() {
           }}
         >
           {videos.map((video) => (
-            <div
+            <Link
               key={video.id}
+              href={`/library/video/${video.id}`}
               style={{
                 padding: "16px",
                 background: "#111",
                 border: "1px solid #1f1f1f",
                 borderRadius: "8px",
                 color: "#ccc",
+                textDecoration: "none",
+                display: "block",
+                transition: "0.2s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "#151515";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "#111";
               }}
             >
               <strong>Prompt:</strong> {video.prompt}
@@ -77,11 +88,10 @@ export default function VideoHistoryPage() {
               </span>
               <br />
               <strong>Fecha:</strong> {video.createdAt}
-            </div>
+            </Link>
           ))}
         </div>
       )}
     </div>
   );
 }
-
