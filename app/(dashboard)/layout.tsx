@@ -1,6 +1,7 @@
 "use client";
 
 import Sidebar from "@/components/dashboard/Sidebar";
+import Header from "@/components/dashboard/Header";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -8,9 +9,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Sidebar */}
       <Sidebar />
 
-      {/* Main content */}
-      <div style={{ flex: 1, padding: "20px" }}>
-        {children}
+      {/* Main area */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+        {/* Header */}
+        <Header />
+
+        {/* Page content */}
+        <div style={{ flex: 1, padding: "20px", overflowY: "auto" }}>
+          {children}
+        </div>
       </div>
     </div>
   );
