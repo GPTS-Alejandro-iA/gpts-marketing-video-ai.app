@@ -15,7 +15,7 @@ export default function SidebarNav() {
   const pathname = usePathname();
 
   return (
-    <nav style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+    <nav style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
       {navItems.map((item) => {
         const isActive = pathname.startsWith(item.href);
 
@@ -24,15 +24,24 @@ export default function SidebarNav() {
             key={item.href}
             href={item.href}
             style={{
-              padding: "10px 12px",
-              borderRadius: "6px",
-              background: isActive ? "#333" : "transparent",
-              color: isActive ? "white" : "#bbb",
+              padding: "10px 14px",
+              borderRadius: "8px",
+              background: isActive ? "#1c1c1c" : "transparent",
+              color: isActive ? "white" : "#9a9a9a",
               textDecoration: "none",
-              fontWeight: isActive ? "bold" : "normal",
+              fontWeight: isActive ? "600" : "400",
               display: "flex",
               alignItems: "center",
-              gap: "10px",
+              gap: "12px",
+              transition: "all 0.18s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = isActive ? "#1c1c1c" : "#151515";
+              e.currentTarget.style.color = "white";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = isActive ? "#1c1c1c" : "transparent";
+              e.currentTarget.style.color = isActive ? "white" : "#9a9a9a";
             }}
           >
             {item.icon}
@@ -43,5 +52,3 @@ export default function SidebarNav() {
     </nav>
   );
 }
-
-
