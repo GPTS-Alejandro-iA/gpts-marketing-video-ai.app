@@ -2,11 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import ConfirmModal from "@/app/components/ConfirmModal";
 
 export default function VideoHistoryPage() {
   const [videos, setVideos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deleting, setDeleting] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchVideos = async () => {
     try {
@@ -29,25 +32,34 @@ export default function VideoHistoryPage() {
     fetchVideos();
   }, []);
 
-  const deleteVideo = async (id: string) => {
-    setDeleting(id);
+  const openDeleteModal = (id: string) => {
+    setSelectedId(id);
+    setModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedId) return;
+
+    setDeleting(true);
 
     try {
       const response = await fetch("/api/videos/delete", {
         method: "POST",
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({ id: selectedId }),
       });
 
       const data = await response.json();
 
       if (data.success) {
-        setVideos((prev) => prev.filter((v) => v.id !== id));
+        setVideos((prev) => prev.filter((v) => v.id !== selectedId));
       }
     } catch (error) {
       console.error("Delete error:", error);
     }
 
-    setDeleting(null);
+    setDeleting(false);
+    setModalOpen(false);
+    setSelectedId(null);
   };
 
   return (
@@ -115,26 +127,41 @@ export default function VideoHistoryPage() {
               </Link>
 
               <button
-                onClick={() => deleteVideo(video.id)}
-                disabled={deleting === video.id}
+                onClick={() => openDeleteModal(video.id)}
                 style={{
                   marginLeft: "20px",
                   padding: "8px 14px",
-                  background: deleting === video.id ? "#333" : "#b71c1c",
+                  background: "#b71c1c",
                   border: "none",
                   borderRadius: "6px",
                   color: "white",
-                  cursor: deleting === video.id ? "not-allowed" : "pointer",
+                  cursor: "pointer",
                   transition: "0.2s",
                 }}
               >
-                {deleting === video.id ? "Deleting..." : "Delete"}
+                Delete
               </button>
             </div>
           ))}
         </div>
       )}
+
+      {/* MODAL */}
+      <ConfirmModal
+        open={modalOpen}
+        title="Delete Video"
+        message="Are you sure you want to delete this video? This action cannot be undone."
+        confirmText={deleting ? "Deleting..." : "Delete"}
+        cancelText="Cancel"
+        onConfirm={confirmDelete}
+        onCancel={() => {
+          setModalOpen(false);
+          setSelectedId(null);
+        }}
+      />
     </div>
   );
 }
 
+
+    
