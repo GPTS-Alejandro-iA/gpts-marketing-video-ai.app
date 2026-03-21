@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { FiTool, FiBook, FiSettings, FiHelpCircle } from "react-icons/fi";
 
 const navItems = [
-  { label: "Tools", href: "/tools" },
-  { label: "Library", href: "/library" },
-  { label: "Settings", href: "/settings" },
-  { label: "Help Center", href: "/help" },
+  { label: "Tools", href: "/tools", icon: <FiTool size={18} /> },
+  { label: "Library", href: "/library", icon: <FiBook size={18} /> },
+  { label: "Settings", href: "/settings", icon: <FiSettings size={18} /> },
+  { label: "Help Center", href: "/help", icon: <FiHelpCircle size={18} /> },
 ];
 
 export default function SidebarNav() {
@@ -29,8 +30,12 @@ export default function SidebarNav() {
               color: isActive ? "white" : "#bbb",
               textDecoration: "none",
               fontWeight: isActive ? "bold" : "normal",
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
             }}
           >
+            {item.icon}
             {item.label}
           </Link>
         );
@@ -38,4 +43,5 @@ export default function SidebarNav() {
     </nav>
   );
 }
+
 
