@@ -6,45 +6,49 @@ import Link from "next/link";
 export default function VideoHistoryPage() {
   const [videos, setVideos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState("all");
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
-  const fetchVideos = async (reset = false) => {
+  const fetchVideos = async () => {
     try {
-      const response = await fetch(`/api/videos/list?page=${page}&filter=${filter}`);
+      const response = await fetch("/api/videos/list");
       const data = await response.json();
 
       if (data.success && Array.isArray(data.data)) {
-        if (reset) {
-          setVideos(data.data);
-        } else {
-          setVideos((prev) => [...prev, ...data.data]);
-        }
-
-        // Si el backend devuelve menos de 10, asumimos que no hay más
-        setHasMore(data.data.length === 10);
+        setVideos(data.data);
       } else {
         setVideos([]);
-        setHasMore(false);
       }
     } catch (error) {
       setVideos([]);
-      setHasMore(false);
     }
 
     setLoading(false);
   };
 
   useEffect(() => {
-    setLoading(true);
-    setPage(1);
-    fetchVideos(true);
-  }, [filter]);
+    fetchVideos();
+  }, []);
 
-  useEffect(() => {
-    if (page > 1) fetchVideos();
-  }, [page]);
+  const deleteVideo = async (id: string) => {
+    setDeleting(id);
+
+    try {
+      const response = await fetch("/api/videos/delete", {
+        method: "POST",
+        body: JSON.stringify({ id }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setVideos((prev) => prev.filter((v) => v.id !== id));
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+    }
+
+    setDeleting(null);
+  };
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
@@ -55,27 +59,6 @@ export default function VideoHistoryPage() {
       <p style={{ color: "#999", margin: 0 }}>
         Aquí podrás ver todos los videos generados recientemente.
       </p>
-
-      {/* Filtros */}
-      <div style={{ display: "flex", gap: "10px" }}>
-        {["all", "completed", "processing", "failed"].map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            style={{
-              padding: "8px 14px",
-              borderRadius: "6px",
-              background: filter === f ? "#1c1c1c" : "#111",
-              border: "1px solid #1f1f1f",
-              color: filter === f ? "white" : "#aaa",
-              cursor: "pointer",
-              transition: "0.2s",
-            }}
-          >
-            {f.charAt(0).toUpperCase() + f.slice(1)}
-          </button>
-        ))}
-      </div>
 
       {loading ? (
         <p style={{ color: "#777" }}>Cargando historial...</p>
@@ -91,66 +74,64 @@ export default function VideoHistoryPage() {
           }}
         >
           {videos.map((video) => (
-            <Link
+            <div
               key={video.id}
-              href={`/library/video/${video.id}`}
               style={{
                 padding: "16px",
                 background: "#111",
                 border: "1px solid #1f1f1f",
                 borderRadius: "8px",
                 color: "#ccc",
-                textDecoration: "none",
-                display: "block",
-                transition: "0.2s",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "#151515";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "#111";
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
               }}
             >
-              <strong>Prompt:</strong> {video.prompt || "N/A"}
-              <br />
-              <strong>Status:</strong>{" "}
-              <span
+              <Link
+                href={`/library/video/${video.id}`}
                 style={{
-                  color:
-                    video.status === "completed"
-                      ? "#4caf50"
-                      : video.status === "processing"
-                      ? "#ff9800"
-                      : video.status === "failed"
-                      ? "#f44336"
-                      : "#ccc",
+                  textDecoration: "none",
+                  color: "#ccc",
+                  flex: 1,
                 }}
               >
-                {video.status}
-              </span>
-              <br />
-              <strong>Fecha:</strong> {video.createdAt || "N/A"}
-            </Link>
-          ))}
+                <strong>Prompt:</strong> {video.prompt || "N/A"}
+                <br />
+                <strong>Status:</strong>{" "}
+                <span
+                  style={{
+                    color:
+                      video.status === "completed"
+                        ? "#4caf50"
+                        : video.status === "processing"
+                        ? "#ff9800"
+                        : "#ccc",
+                  }}
+                >
+                  {video.status}
+                </span>
+                <br />
+                <strong>Fecha:</strong> {video.createdAt || "N/A"}
+              </Link>
 
-          {/* Botón Load More */}
-          {hasMore && (
-            <button
-              onClick={() => setPage((p) => p + 1)}
-              style={{
-                marginTop: "10px",
-                padding: "12px",
-                background: "#1c1c1c",
-                border: "1px solid #333",
-                borderRadius: "8px",
-                color: "white",
-                cursor: "pointer",
-                fontWeight: "600",
-              }}
-            >
-              Load more
-            </button>
-          )}
+              <button
+                onClick={() => deleteVideo(video.id)}
+                disabled={deleting === video.id}
+                style={{
+                  marginLeft: "20px",
+                  padding: "8px 14px",
+                  background: deleting === video.id ? "#333" : "#b71c1c",
+                  border: "none",
+                  borderRadius: "6px",
+                  color: "white",
+                  cursor: deleting === video.id ? "not-allowed" : "pointer",
+                  transition: "0.2s",
+                }}
+              >
+                {deleting === video.id ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          ))}
         </div>
       )}
     </div>
