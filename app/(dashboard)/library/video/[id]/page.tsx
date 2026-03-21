@@ -9,18 +9,24 @@ export default function VideoDetailsPage({ params }: { params: { id: string } })
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Más adelante esto vendrá de tu backend real
-    // Por ahora simulamos datos
-    setTimeout(() => {
-      setVideo({
-        id,
-        prompt: "Video sobre paneles solares EG4",
-        status: "completed",
-        createdAt: "2026-03-20 10:32 AM",
-        outputUrl: null, // luego aquí irá el video final
-      });
+    const fetchVideo = async () => {
+      try {
+        const response = await fetch(`/api/videos/${id}`);
+        const data = await response.json();
+
+        if (data.success) {
+          setVideo(data.data);
+        } else {
+          setVideo(null);
+        }
+      } catch (error) {
+        setVideo(null);
+      }
+
       setLoading(false);
-    }, 500);
+    };
+
+    fetchVideo();
   }, [id]);
 
   if (loading) {
@@ -53,8 +59,9 @@ export default function VideoDetailsPage({ params }: { params: { id: string } })
           gap: "12px",
         }}
       >
-        <p><strong>ID:</strong> {video.id}</p>
-        <p><strong>Prompt:</strong> {video.prompt}</p>
+        <p><strong>ID:</strong> {id}</p>
+        <p><strong>Prompt:</strong> {video.prompt || "N/A"}</p>
+
         <p>
           <strong>Status:</strong>{" "}
           <span
@@ -70,7 +77,8 @@ export default function VideoDetailsPage({ params }: { params: { id: string } })
             {video.status}
           </span>
         </p>
-        <p><strong>Fecha:</strong> {video.createdAt}</p>
+
+        <p><strong>Fecha:</strong> {video.createdAt || "N/A"}</p>
 
         <div
           style={{
@@ -99,4 +107,3 @@ export default function VideoDetailsPage({ params }: { params: { id: string } })
     </div>
   );
 }
-
