@@ -1,35 +1,40 @@
 import { NextResponse } from "next/server";
 
-export async function POST(req: Request) {
+export async function GET(req: Request) {
   try {
-    const { prompt } = await req.json();
+    const { searchParams } = new URL(req.url);
 
-    if (!prompt) {
-      return NextResponse.json(
-        { error: "Prompt is required" },
-        { status: 400 }
-      );
+    const page = Number(searchParams.get("page") || 1);
+    const filter = searchParams.get("filter") || "all";
+
+    // Construimos la URL para el backend
+    const backendUrl = new URL(`${process.env.RUNPOD_API_URL}/list`);
+
+    backendUrl.searchParams.set("page", page.toString());
+    backendUrl.searchParams.set("limit", "10"); // 10 por página
+
+    if (filter !== "all") {
+      backendUrl.searchParams.set("filter", filter);
     }
 
-    // Llamada al backend de RunPod (reemplaza la URL con tu endpoint real)
-    const response = await fetch(process.env.RUNPOD_API_URL as string, {
-      method: "POST",
+    // Llamada al backend real
+    const response = await fetch(backendUrl.toString(), {
+      method: "GET",
       headers: {
-        "Content-Type": "application/json",
         Authorization: `Bearer ${process.env.RUNPOD_API_KEY}`,
       },
-      body: JSON.stringify({ prompt }),
     });
 
     const data = await response.json();
 
     return NextResponse.json({ success: true, data });
   } catch (error) {
-    console.error("Video API Error:", error);
+    console.error("Video List API Error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
     );
   }
 }
+
 
