@@ -8,25 +8,24 @@ export default function VideoHistoryPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Aquí luego conectarás tu backend real o base de datos
-    // Por ahora usamos datos simulados
-    setTimeout(() => {
-      setVideos([
-        {
-          id: "1",
-          prompt: "Video sobre paneles solares EG4",
-          status: "completed",
-          createdAt: "2026-03-20 10:32 AM",
-        },
-        {
-          id: "2",
-          prompt: "Demo del Ark7200 para clientes",
-          status: "processing",
-          createdAt: "2026-03-20 11:10 AM",
-        },
-      ]);
+    const fetchVideos = async () => {
+      try {
+        const response = await fetch("/api/videos/list");
+        const data = await response.json();
+
+        if (data.success && Array.isArray(data.data)) {
+          setVideos(data.data);
+        } else {
+          setVideos([]);
+        }
+      } catch (error) {
+        setVideos([]);
+      }
+
       setLoading(false);
-    }, 600);
+    };
+
+    fetchVideos();
   }, []);
 
   return (
@@ -41,6 +40,8 @@ export default function VideoHistoryPage() {
 
       {loading ? (
         <p style={{ color: "#777" }}>Cargando historial...</p>
+      ) : videos.length === 0 ? (
+        <p style={{ color: "#777" }}>No hay videos generados aún.</p>
       ) : (
         <div
           style={{
@@ -71,7 +72,7 @@ export default function VideoHistoryPage() {
                 e.currentTarget.style.background = "#111";
               }}
             >
-              <strong>Prompt:</strong> {video.prompt}
+              <strong>Prompt:</strong> {video.prompt || "N/A"}
               <br />
               <strong>Status:</strong>{" "}
               <span
@@ -87,7 +88,7 @@ export default function VideoHistoryPage() {
                 {video.status}
               </span>
               <br />
-              <strong>Fecha:</strong> {video.createdAt}
+              <strong>Fecha:</strong> {video.createdAt || "N/A"}
             </Link>
           ))}
         </div>
