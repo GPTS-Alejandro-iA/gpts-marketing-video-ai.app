@@ -5,10 +5,18 @@ import { usePathname } from "next/navigation";
 import { FiTool, FiBook, FiSettings, FiHelpCircle } from "react-icons/fi";
 
 const navItems = [
+  // TOOLS
   { label: "Tools", href: "/tools", icon: <FiTool size={18} /> },
   { label: "Generate Video", href: "/tools/generate-video", icon: <FiTool size={18} /> },
+
+  // LIBRARY
   { label: "Library", href: "/library", icon: <FiBook size={18} /> },
+  { label: "Video History", href: "/library/video-history", icon: <FiBook size={18} /> },
+
+  // SETTINGS
   { label: "Settings", href: "/settings", icon: <FiSettings size={18} /> },
+
+  // HELP
   { label: "Help Center", href: "/help", icon: <FiHelpCircle size={18} /> },
 ];
 
@@ -53,4 +61,3 @@ export default function SidebarNav() {
     </nav>
   );
 }
-
