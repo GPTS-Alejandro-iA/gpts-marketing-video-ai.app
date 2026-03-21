@@ -6,6 +6,7 @@ import { FiTool, FiBook, FiSettings, FiHelpCircle } from "react-icons/fi";
 
 const navItems = [
   { label: "Tools", href: "/tools", icon: <FiTool size={18} /> },
+  { label: "Generate Video", href: "/tools/generate-video", icon: <FiTool size={18} /> },
   { label: "Library", href: "/library", icon: <FiBook size={18} /> },
   { label: "Settings", href: "/settings", icon: <FiSettings size={18} /> },
   { label: "Help Center", href: "/help", icon: <FiHelpCircle size={18} /> },
@@ -52,3 +53,4 @@ export default function SidebarNav() {
     </nav>
   );
 }
+
