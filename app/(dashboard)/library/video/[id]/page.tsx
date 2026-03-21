@@ -9,6 +9,8 @@ export default function VideoDetailsPage({ params }: { params: { id: string } })
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let interval: any = null;
+
     const fetchVideo = async () => {
       try {
         const response = await fetch(`/api/videos/${id}`);
@@ -16,6 +18,11 @@ export default function VideoDetailsPage({ params }: { params: { id: string } })
 
         if (data.success) {
           setVideo(data.data);
+
+          // Si el video ya está listo, detenemos el polling
+          if (data.data.status === "completed") {
+            clearInterval(interval);
+          }
         } else {
           setVideo(null);
         }
@@ -26,7 +33,14 @@ export default function VideoDetailsPage({ params }: { params: { id: string } })
       setLoading(false);
     };
 
+    // Primera carga
     fetchVideo();
+
+    // Polling cada 4 segundos
+    interval = setInterval(fetchVideo, 4000);
+
+    // Cleanup
+    return () => clearInterval(interval);
   }, [id]);
 
   if (loading) {
@@ -99,7 +113,7 @@ export default function VideoDetailsPage({ params }: { params: { id: string } })
             />
           ) : (
             <p style={{ color: "#777", marginTop: "8px" }}>
-              El video aún no está disponible.
+              El video aún no está disponible. Actualizando automáticamente…
             </p>
           )}
         </div>
@@ -107,3 +121,4 @@ export default function VideoDetailsPage({ params }: { params: { id: string } })
     </div>
   );
 }
+
