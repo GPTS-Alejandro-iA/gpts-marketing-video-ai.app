@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import SidebarNav from "@/components/dashboard/SidebarNav";
 
 export default function Sidebar() {
   return (
@@ -11,16 +11,16 @@ export default function Sidebar() {
         color: "white",
         padding: "20px",
         height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        gap: "20px",
       }}
     >
-      <h2 style={{ marginBottom: "20px" }}>Dashboard</h2>
+      <h2 style={{ margin: 0, fontSize: "20px", fontWeight: "bold" }}>
+        Dashboard
+      </h2>
 
-      <nav style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-        <Link href="/tools">Tools</Link>
-        <Link href="/library">Library</Link>
-        <Link href="/settings">Settings</Link>
-        <Link href="/help">Help Center</Link>
-      </nav>
+      <SidebarNav />
     </div>
   );
 }
