@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function VideoDetailsPage({ params }: { params: { id: string } }) {
   const { id } = params;
+  const router = useRouter();
 
   const [video, setVideo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     let interval: any = null;
@@ -19,7 +22,6 @@ export default function VideoDetailsPage({ params }: { params: { id: string } })
         if (data.success) {
           setVideo(data.data);
 
-          // Si el video ya está listo, detenemos el polling
           if (data.data.status === "completed") {
             clearInterval(interval);
           }
@@ -33,15 +35,32 @@ export default function VideoDetailsPage({ params }: { params: { id: string } })
       setLoading(false);
     };
 
-    // Primera carga
     fetchVideo();
-
-    // Polling cada 4 segundos
     interval = setInterval(fetchVideo, 4000);
 
-    // Cleanup
     return () => clearInterval(interval);
   }, [id]);
+
+  const deleteVideo = async () => {
+    setDeleting(true);
+
+    try {
+      const response = await fetch("/api/videos/delete", {
+        method: "POST",
+        body: JSON.stringify({ id }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        router.push("/library/video-history");
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+    }
+
+    setDeleting(false);
+  };
 
   if (loading) {
     return <p style={{ color: "#777" }}>Cargando detalles...</p>;
@@ -117,6 +136,25 @@ export default function VideoDetailsPage({ params }: { params: { id: string } })
             </p>
           )}
         </div>
+
+        {/* DELETE BUTTON */}
+        <button
+          onClick={deleteVideo}
+          disabled={deleting}
+          style={{
+            marginTop: "20px",
+            padding: "12px",
+            background: deleting ? "#333" : "#b71c1c",
+            border: "none",
+            borderRadius: "8px",
+            color: "white",
+            cursor: deleting ? "not-allowed" : "pointer",
+            fontWeight: "600",
+            transition: "0.2s",
+          }}
+        >
+          {deleting ? "Deleting..." : "Delete Video"}
+        </button>
       </div>
     </div>
   );
