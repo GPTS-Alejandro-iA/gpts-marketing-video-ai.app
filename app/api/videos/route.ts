@@ -7,22 +7,19 @@ export async function GET(req: Request) {
     const page = Number(searchParams.get("page") || 1);
     const filter = searchParams.get("filter") || "all";
 
-    // Construimos la URL para el backend
-    const backendUrl = new URL(`${process.env.RUNPOD_API_URL}/list`);
+    // Nueva URL del backend en Render
+    const backendUrl = new URL(`${process.env.BACKEND_URL}/videos/list`);
 
     backendUrl.searchParams.set("page", page.toString());
-    backendUrl.searchParams.set("limit", "10"); // 10 por página
+    backendUrl.searchParams.set("limit", "10");
 
     if (filter !== "all") {
       backendUrl.searchParams.set("filter", filter);
     }
 
-    // Llamada al backend real
+    // Llamada al backend en Render
     const response = await fetch(backendUrl.toString(), {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${process.env.RUNPOD_API_KEY}`,
-      },
     });
 
     const data = await response.json();
@@ -37,4 +34,5 @@ export async function GET(req: Request) {
   }
 }
 
+ 
 
