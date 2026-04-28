@@ -1,13 +1,13 @@
 "use client";
 
-import { runVideoBackend } from "@/lib/runpod";
 import { useState } from "react";
 
 export default function GeneratePage() {
   const [result, setResult] = useState(null);
 
   async function handleGenerate() {
-    const response = await runVideoBackend("hola");
+    // Aquí puedes llamar a tu backend local o dejarlo vacío por ahora
+    const response = { message: "Backend local no implementado aún" };
     console.log(response);
     setResult(response);
   }
@@ -24,4 +24,5 @@ export default function GeneratePage() {
     </div>
   );
 }
+
 
