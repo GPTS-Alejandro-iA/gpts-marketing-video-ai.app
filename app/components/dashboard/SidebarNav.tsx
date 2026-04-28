@@ -26,7 +26,7 @@ export default function SidebarNav() {
   return (
     <nav style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
       {navItems.map((item) => {
-        const isActive = pathname.startsWith(item.href);
+       const isActive = pathname?.startsWith(item.href) ?? false;
 
         return (
           <Link
