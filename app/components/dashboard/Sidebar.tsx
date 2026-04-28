@@ -1,6 +1,7 @@
 "use client";
 
-import SidebarNav from "@/components/dashboard/SidebarNav";
+import SidebarNav from "@/app/components/dashboard/SidebarNav";
+
 
 export default function Sidebar() {
   return (
